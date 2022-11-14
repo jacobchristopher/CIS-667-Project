@@ -5,24 +5,32 @@ import rule_helpers as rh
 class HelperTestCase(ut.TestCase):
 
     def test_initial_state(self):
-        args = ["p > q", "p"]
+        args = ["p -> q", "p"]
         claim = "q"
         state  = sh.initial_state(args, claim)
         expected_state = (args, claim, [])
         self.assertEqual(state, expected_state)
 
     def test_proof_complete(self):
-        args = ["p > q", "p"]
+        args = ["p -> q", "p"]
         claim = "q"
         args.append(claim)
         state = (args, claim, [])
         self.assertTrue(sh.proof_complete(state))
     
     def test_proof_incomplete(self):
-        args = ["p > q", "p"]
+        args = ["p -> q", "p"]
         claim = "q"
         state = (args, claim, [])
         self.assertFalse(sh.proof_complete(state))
+
+    def test_valid_actions(self):
+        args = ["p -> q", "p"]
+        claim = "q"
+        state = (args, claim, [])
+        applic = sh.valid_actions(state)
+        exp = [((['a', 'a -> b'], 'b'), [0, 1])]
+        self.assertEqual(applic, exp)
 
 
 class RuleTestCase(ut.TestCase):
@@ -51,6 +59,14 @@ class RuleTestCase(ut.TestCase):
         exp = ("a | b", "(p * r)", "(q -> r)")
         self.assertEqual(ans, exp)
 
+    def test_applicable_rules1(self):
+        args = ["p -> q", "p"]
+        claim = "q"
+        state = (args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [((['a', 'a -> b'], 'b'), [0, 1])]
+        self.assertEqual(applic, exp)
+
 
 # Note that __main__ is written based on test function implementation
 # from the following source.
@@ -69,4 +85,4 @@ if __name__ == "__main__":
         errs += len(res.errors)
         fails += len(res.failures)
     
-    print("score: %d of %d (%d errors, %d failures)" % (num - (errs+fails), num, errs, fails))
+    print("\nscore: %d of %d (%d errors, %d failures)" % (num - (errs+fails), num, errs, fails))
