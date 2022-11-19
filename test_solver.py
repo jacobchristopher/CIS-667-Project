@@ -29,8 +29,18 @@ class HelperTestCase(ut.TestCase):
         claim = "q"
         state = (args, claim, [])
         applic = sh.valid_actions(state)
-        exp = [((['a', 'a -> b'], 'b'), [0, 1])]
+        exp = [(('Modus Ponens',['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)
+
+    def test_apply_rule_MP(self):
+        args = ["p -> q", "p"]
+        claim = "q"
+        state = (args, claim, [])
+        applic = sh.valid_actions(state)
+        exp = (["p -> q", "p", "q"], claim, [("Modus Ponens", [1,0], 2)])
+        state = sh.apply_rule(applic[0], state)
+        self.assertEqual(state, exp)
+        self.assertTrue(sh.proof_complete(state))
 
 
 class RuleTestCase(ut.TestCase):
@@ -64,7 +74,7 @@ class RuleTestCase(ut.TestCase):
         claim = "q"
         state = (args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [((['a', 'a -> b'], 'b'), [0, 1])]
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)
 
 

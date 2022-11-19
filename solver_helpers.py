@@ -41,15 +41,13 @@ def valid_actions(state: tuple) -> list:
 # Update the state by applying the given rule
 def apply_rule(rule: tuple, state: tuple) -> tuple:
     (args, claim, hist) = state
-    # (name, form, index) = rule
-    name = ""
-    (form, index) = rule
-    (pattern, concl) = form
+    (form, indices, a, b) = rule
+    (name, pattern, concl) = form
 
     # Add to the hist element; tuple contains name of rule, indices that are 
     # referenced, and the index that the new arg will be added at
-    hist.append((name, index, args.length))
-    (a, b) = rh.get_ab_vars(rule, args)
+    # Note: Not storing index in rule in history (as it is sorted)
+    hist.append((name, rh.take_1_of_2_mapper(indices), len(args)))
     result = rh.convert_to_complex(concl, a, b)
     args.append(result)
     return (args, claim, hist)
