@@ -48,15 +48,15 @@ def apply_rule(rule: tuple, state: tuple) -> tuple:
     # Add to the hist element; tuple contains name of rule, indices that are 
     # referenced, and the index that the new arg will be added at
     # Note: Not storing index in rule in history (as it is sorted)
-    # FIXME: Add this conversion to frozenset into pack/unpack?
-    hist.append((name, frozenset(rh.take_1_of_2_mapper(indices)), len(args)))
+    # FIXME: Add this conversion to (and from) tuple into pack/unpack?
+    hist.append((name, tuple(rh.take_1_of_2_mapper(indices)), len(args)))
     result = rh.convert_to_complex(concl, a, b)
     args.append(result)
     return pack(args, claim, hist)
 
 #-------------------------------------------------------------------------
 def pack(args, claim, hist):
-        return (frozenset(args), claim, frozenset(hist))
+        return (tuple(args), claim, tuple(hist))
 
 def unpack(state):
     args, claim, hist = state

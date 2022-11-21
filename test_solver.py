@@ -37,7 +37,7 @@ class HelperTestCase(ut.TestCase):
         claim = "q"
         state = sh.pack(args, claim, [])
         applic = sh.valid_actions(state)
-        exp = (["p -> q", "p", "q"], claim, [("Modus Ponens", [1,0], 2)])
+        exp = sh.pack(["p -> q", "p", "q"], claim, [("Modus Ponens", (1,0), 2)])
         state = sh.apply_rule(applic[0], state)
         self.assertEqual(state, exp)
         self.assertTrue(sh.proof_complete(state))
