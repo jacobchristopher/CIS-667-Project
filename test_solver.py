@@ -8,26 +8,26 @@ class HelperTestCase(ut.TestCase):
         args = ["p -> q", "p"]
         claim = "q"
         state  = sh.initial_state(args, claim)
-        expected_state = (args, claim, [])
+        expected_state = sh.pack(args, claim, [])
         self.assertEqual(state, expected_state)
 
     def test_proof_complete(self):
         args = ["p -> q", "p"]
         claim = "q"
         args.append(claim)
-        state = (args, claim, [])
+        state = sh.pack(args, claim, [])
         self.assertTrue(sh.proof_complete(state))
     
     def test_proof_incomplete(self):
         args = ["p -> q", "p"]
         claim = "q"
-        state = (args, claim, [])
+        state = sh.pack(args, claim, [])
         self.assertFalse(sh.proof_complete(state))
 
     def test_valid_actions(self):
         args = ["p -> q", "p"]
         claim = "q"
-        state = (args, claim, [])
+        state = sh.pack(args, claim, [])
         applic = sh.valid_actions(state)
         exp = [(('Modus Ponens',['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)
@@ -35,7 +35,7 @@ class HelperTestCase(ut.TestCase):
     def test_apply_rule_MP(self):
         args = ["p -> q", "p"]
         claim = "q"
-        state = (args, claim, [])
+        state = sh.pack(args, claim, [])
         applic = sh.valid_actions(state)
         exp = (["p -> q", "p", "q"], claim, [("Modus Ponens", [1,0], 2)])
         state = sh.apply_rule(applic[0], state)
@@ -72,7 +72,7 @@ class RuleTestCase(ut.TestCase):
     def test_applicable_rules1(self):
         args = ["p -> q", "p"]
         claim = "q"
-        state = (args, claim, [])
+        state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)

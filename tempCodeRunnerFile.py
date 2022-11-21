@@ -1,0 +1,1 @@
+    print(applic[0])

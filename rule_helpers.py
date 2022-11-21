@@ -1,3 +1,5 @@
+import solver_helpers as sh
+
 # This file will contain helper functions for finding which inference rules
 # are applicable in a given state.
 
@@ -65,7 +67,7 @@ rule_dict = [("Modus Ponens", ["a", "a -> b"], "b")]
 
 # Find applicable rules from the rule dictionary
 def applicable_rules(state: tuple) -> list:
-    (args, claim, hist) = state
+    (args, claim, hist) = sh.unpack(state)
     can_apply = []
     for rules in rule_dict:
         cond_index = [] # a list to contain all args that match the rule
