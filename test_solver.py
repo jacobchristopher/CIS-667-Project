@@ -77,6 +77,15 @@ class RuleTestCase(ut.TestCase):
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)
 
+    def test_applicable_rules2(self):
+        args = ["p -> q", "p", "x -> y", "x"]
+        claim = "q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q'), 
+               (('Modus Ponens', ['a', 'a -> b'], 'b'), [(3, 0), (2, 1)], 'x', 'y')]
+        self.assertEqual(applic, exp)
+
 
 # Note that __main__ is written based on test function implementation
 # from the following source.

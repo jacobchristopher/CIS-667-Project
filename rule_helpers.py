@@ -95,10 +95,33 @@ def applicable_rules(state: tuple) -> list:
         # TODO: Check for common "a" and "b" variables to see if any
         #       multiple arg rules can be applied
         #       Then, drop 'a' and 'b' values from tuple.
-        cond_index = take_2_of_4_mapper(cond_index)
-        arg_pairings = cond_index #FIXME
-        can_apply.append((rules, arg_pairings, a, b))
+        arg_pairings = find_common_pairings(rules, cond_index)
+        can_apply.extend(arg_pairings)
     return can_apply
+
+
+# TODO: Fix to work with rules that have more than a,b values
+def find_common_pairings(rules: tuple, cond_index: list) -> list:
+    (name, rule_args, cond) = rules
+    pairing_list = [] # (a, b, c, )
+
+    for x in cond_index:
+        common_rules = []
+        a = x[2]
+        b = x[3]
+        for y in cond_index:
+            if y[2] == a:
+                if y[3] == b or b == "":
+                    common_rules.append(y)
+        pairing_list.append(tuple(common_rules))
+
+    final_list = []
+    for x in pairing_list:
+        if len(x) == len(rule_args):
+            elem = (rules, take_2_of_4_mapper(list(x)), x[0][2], x[0][3])
+            if elem not in final_list:
+                final_list.append(elem)
+    return final_list
 
 
 def take_2_of_4_mapper(lst: list) -> list:
