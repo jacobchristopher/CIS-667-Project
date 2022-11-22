@@ -35,7 +35,6 @@ def proof_complete(state: tuple) -> bool:
 # - index:  A list of the indices of the element of args that this rule 
 #           applies to.
 def valid_actions(state: tuple) -> list:
-    #TODO: Find way to convert this to the canonical form described abive
     return rh.applicable_rules(state)
 
 

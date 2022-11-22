@@ -69,6 +69,12 @@ class RuleTestCase(ut.TestCase):
         exp = ("a | b", "(p * r)", "(q -> r)")
         self.assertEqual(ans, exp)
 
+    def test_negation_parse(self):
+        arg = "~p -> ~r"
+        ans = rh.parse_expression(arg)
+        exp = ("~a -> ~b", 'p', 'r')
+        self.assertEqual(ans, exp)
+
     def test_applicable_rules1(self):
         args = ["p -> q", "p"]
         claim = "q"
@@ -94,6 +100,42 @@ class RuleTestCase(ut.TestCase):
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q')]
         self.assertEqual(applic, exp)
 
+    def test_applicable_rules4(self):
+        args = ["p -> q", "q -> r", "p", "r -> s"]
+        claim = "s"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2,0), (0,1)], 'p', 'q')]
+        self.assertEqual(applic, exp)
+
+
+class RuleDictTestCase(ut.TestCase):
+
+    # def test_conjunction_rule(self):
+    #     args = ["p", "q"]
+    #     claim = "p & q"
+    #     state = sh.pack(args, claim, [])
+    #     applic = rh.applicable_rules(state)
+    #     exp = [(('Conjunction', ['a', 'b'], 'a & b'), [(0,0), (1,1)], 'p', 'q')]
+    #     self.assertEqual(applic, exp)
+
+    def test_simplification_rule(self):
+        args = ["p & q"]
+        claim = "q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Simplification', ['a & b'], 'a'), [(0,0)], 'p', 'q'), (('Simplification', ['a & b'], 'b'), [(0,0)], 'p', 'q')]
+        self.assertEqual(applic, exp)
+
+    def test_disjunctive_syllogism_rule(self):
+        args = ["p | q", "~p"]
+        claim = "q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Disjunctive Syllogism', ['a | b', '~a'], 'b'), [(0, 0), (1, 1)], 'p', 'q')]
+        self.assertEqual(applic, exp)
+
+
 
 # Note that __main__ is written based on test function implementation
 # from the following source.
@@ -103,7 +145,7 @@ class RuleTestCase(ut.TestCase):
 if __name__ == "__main__":
 
     num, errs, fails = 0, 0, 0
-    test_cases = [HelperTestCase, RuleTestCase]
+    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase]
     
     for test_case in test_cases:
         test_suite = ut.TestLoader().loadTestsFromTestCase(test_case)

@@ -23,9 +23,7 @@ if __name__ == "__main__":
 
     problem = SearchProblem(state, sh.proof_complete)
     
-    # print ("==> BFS BEGIN")
     plan, node_count = breadth_first_search(problem)
-    # print ("==> BFS DONE")
     # plan, node_count = a_star_search(problem, domain.simple_heuristic)
 
     states = [problem.initial_state]
@@ -33,9 +31,7 @@ if __name__ == "__main__":
         states.append(sh.apply_rule(plan[a], states[-1]))
 
     # Display final proof
-    # print(states)
     final_state = states[len(states)-1]
-    # print(final_state)
     (args, claim, hist) = sh.unpack(final_state)
     start_rule = hist[0][2]
     hist_index = 0

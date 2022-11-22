@@ -7,12 +7,18 @@ import solver_helpers as sh
 #   1. The simplified expression
 #   2. The original terms in the expression
 def parse_expression(exp: str) -> tuple:  
-    # TODO: Check for negation
-
     # Check if first term is paren
     astart = 0
     aend = 1
-    if exp[astart:aend] == "(":
+    negation_a = False
+
+    # Check for negation
+    if exp[astart:aend] == "~":
+        negation_a = True
+        astart += 1
+        aend += 1
+
+    if exp[(aend-1):aend] == "(":
         aend = find_end_paren(exp, astart)
     a = exp[astart:aend]
 
@@ -25,14 +31,30 @@ def parse_expression(exp: str) -> tuple:
 
     bstart = tend+1
     bend = bstart+1
+
+    negation_b = False
+
+    # Check for negation
+    if exp[bstart:bend] == "~":
+        negation_b = True
+        bstart += 1
+        bend += 1
+
     if exp[bstart:bend] == "(":
         bend = find_end_paren(exp, bstart)
     b = exp[bstart:bend]
+
     simplified = ""
+    if negation_a:
+        simplified += "~"
     if len(a) > 0:
         simplified += "a"
     if len(term) > 0:
-        simplified += " " + term + " b"
+        simplified += " " + term + " " 
+    if negation_b:
+        simplified += "~"
+    if len(b) > 0:
+        simplified += "b"
     return (simplified, a, b)
 
 
@@ -63,7 +85,16 @@ def get_ab_vars(rule, args) -> tuple:
 #--------------------------------------------------------------
 
 #TODO: rectify differences between solver_helper def and this one
-rule_dict = [("Modus Ponens", ["a", "a -> b"], "b")]
+rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"), 
+             #("Modus Tollens", ["~b", "a -> b"], "~a"),
+             ("Simplification", ["a & b"], "a"),
+             ("Simplification", ["a & b"], "b"),
+             #("Conjunction", ["a", "b"], "a & b"),
+             ("Disjunctive Syllogism", ["a | b", "~a"], "b"),
+             ("Disjunctive Syllogism", ["a | b", "~b"], "a"),
+             #("Hypothetical Syllogism", ["a -> b", "b -> c"], "a -> c"),
+             #("Double Negation", ["~~a"], "a"),
+            ]
 
 # Find applicable rules from the rule dictionary
 def applicable_rules(state: tuple) -> list:
@@ -75,27 +106,18 @@ def applicable_rules(state: tuple) -> list:
         i = 0
         b = ""
         for arg in args:
-            (simp, new_a, new_b) = parse_expression(arg)
-
-            # FIXME: This should not be necessary when TODO below is 
-            # implemented (final 'a' and 'b' values sourced from there)
-            a = new_a
-            if not new_b == "":
-                b = new_b
-            
+            (simp, a, b) = parse_expression(arg)
             if simp in rule_args:
+                rule_idx = rule_args.index(simp)
                 # Form is:
                 # 1. Index in args
                 # 2. Index in rule
                 # 3. 'a'
                 # 4. 'b'
-                cond_index.append((i, rule_args.index(simp), a, b))
+                cond_index.append((i, rule_idx, a, b))
             i += 1
         cond_index.sort(key = lambda x: x[1])
-        # TODO: Check for common "a" and "b" variables to see if any
-        #       multiple arg rules can be applied
-        #       Then, drop 'a' and 'b' values from tuple.
-        arg_pairings = find_common_pairings(rules, cond_index) # [(rules, take_2_of_4_mapper(cond_index), a, b)]  
+        arg_pairings = find_common_pairings(rules, cond_index)
         can_apply.extend(arg_pairings)
     return can_apply
 
@@ -104,7 +126,6 @@ def applicable_rules(state: tuple) -> list:
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
     pairing_list = [] # (a, b, c, )
-
     for x in cond_index:
         common_rules = []
         a = x[2]
@@ -112,7 +133,7 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
         for y in cond_index:
             if y[2] == a:
                 if y[3] == b or b == "":
-                    common_rules.append(y)
+                    if y not in common_rules: common_rules.append(y)
         pairing_list.append(tuple(common_rules))
 
     final_list = []
@@ -132,6 +153,7 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
                 final_list.append(elem)
     return final_list
 
+# ---------------------------------------------------------------
 
 def take_2_of_4_mapper(lst: list) -> list:
     rtrn_lst = []
