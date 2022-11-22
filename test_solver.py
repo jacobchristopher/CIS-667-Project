@@ -119,6 +119,22 @@ class RuleDictTestCase(ut.TestCase):
     #     exp = [(('Conjunction', ['a', 'b'], 'a & b'), [(0,0), (1,1)], 'p', 'q')]
     #     self.assertEqual(applic, exp)
 
+    def test_modus_tollens_rule(self):
+        args = ["~p", "q -> p"]
+        claim = "~q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Tollens', ['~b', 'a -> b'], '~a'), [(0, 0), (1, 1)], 'q', 'p')]
+        self.assertEqual(applic, exp)
+
+    def test_modus_ponens_rule(self):
+        args = ["p", "p -> q"]
+        claim = "q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q')]
+        self.assertEqual(applic, exp)
+
     def test_simplification_rule(self):
         args = ["p & q"]
         claim = "q"

@@ -86,10 +86,10 @@ def get_ab_vars(rule, args) -> tuple:
 
 #TODO: rectify differences between solver_helper def and this one
 rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"), 
-             #("Modus Tollens", ["~b", "a -> b"], "~a"),
+             ("Modus Tollens", ["~b", "a -> b"], "~a"),
              ("Simplification", ["a & b"], "a"),
              ("Simplification", ["a & b"], "b"),
-             #("Conjunction", ["a", "b"], "a & b"),
+             ("Conjunction", ["a", "b"], "a & b"),
              ("Disjunctive Syllogism", ["a | b", "~a"], "b"),
              ("Disjunctive Syllogism", ["a | b", "~b"], "a"),
              #("Hypothetical Syllogism", ["a -> b", "b -> c"], "a -> c"),
@@ -115,6 +115,12 @@ def applicable_rules(state: tuple) -> list:
                 # 3. 'a'
                 # 4. 'b'
                 cond_index.append((i, rule_idx, a, b))
+            elif simp.replace('a', 'b') in rule_args:
+                simp = simp.replace('a', 'b')
+                rule_idx = rule_args.index(simp)
+                b = a
+                a = ""
+                cond_index.append((i, rule_idx, a, b))
             i += 1
         cond_index.sort(key = lambda x: x[1])
         arg_pairings = find_common_pairings(rules, cond_index)
@@ -131,16 +137,22 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
         a = x[2]
         b = x[3]
         for y in cond_index:
-            if y[2] == a:
+            if y[2] == a or y[2] == "":
                 if y[3] == b or b == "":
                     if y not in common_rules: common_rules.append(y)
         pairing_list.append(tuple(common_rules))
-
     final_list = []
     for x in pairing_list:
         if len(x) == len(rule_args):
             a = x[0][2]
             b = x[0][3]
+            index = 1
+            while a == "":
+                if index < (len(x)):
+                    a = x[index][2]
+                    index += 1
+                else:
+                    break
             index = 1
             while b == "":
                 if index < (len(x)):
