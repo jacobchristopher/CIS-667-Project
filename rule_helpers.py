@@ -79,12 +79,8 @@ def convert_to_complex(expr: str, a: str, b:str) -> str:
     new_expr = new_expr.replace("b", b)
     return new_expr
 
-def get_ab_vars(rule, args) -> tuple:
-    return("a", "b") #TODO: implement
-
 #--------------------------------------------------------------
 
-#TODO: rectify differences between solver_helper def and this one
 rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"), 
              ("Modus Tollens", ["~b", "a -> b"], "~a"),
              ("Simplification", ["a & b"], "a"),
@@ -132,6 +128,18 @@ def applicable_rules(state: tuple) -> list:
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
     pairing_list = [] # (a, b, c, )
+    #print(cond_index)
+    # Special Case #1
+    if name == "Conjunction":
+        for x in cond_index:
+            a = x[2]
+            for y in cond_index:
+                b = y[2]
+                elem = (rules, take_2_of_4_mapper([x,y]), a, b)
+                if elem not in pairing_list:
+                    pairing_list.append(elem)
+        return pairing_list
+    # Standard Case
     for x in cond_index:
         common_rules = []
         a = x[2]

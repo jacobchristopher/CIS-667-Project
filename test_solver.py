@@ -29,7 +29,8 @@ class HelperTestCase(ut.TestCase):
         claim = "q"
         state = sh.pack(args, claim, [])
         applic = sh.valid_actions(state)
-        exp = [(('Modus Ponens',['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
+        exp = [(('Modus Ponens',['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (1, 0)], 'p', 'p')]
         self.assertEqual(applic, exp)
 
     def test_apply_rule_MP(self):
@@ -80,7 +81,8 @@ class RuleTestCase(ut.TestCase):
         claim = "q"
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q')]
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (1, 0)], 'p', 'p')]
         self.assertEqual(applic, exp)
 
     def test_applicable_rules2(self):
@@ -89,7 +91,11 @@ class RuleTestCase(ut.TestCase):
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(1, 0), (0, 1)], 'p', 'q'), 
-               (('Modus Ponens', ['a', 'a -> b'], 'b'), [(3, 0), (2, 1)], 'x', 'y')]
+               (('Modus Ponens', ['a', 'a -> b'], 'b'), [(3, 0), (2, 1)], 'x', 'y'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (1, 0)], 'p', 'p'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (3, 0)], 'p', 'x'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(3, 0), (1, 0)], 'x', 'p'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(3, 0), (3, 0)], 'x', 'x')]
         self.assertEqual(applic, exp)
 
     def test_applicable_rules3(self):
@@ -97,7 +103,8 @@ class RuleTestCase(ut.TestCase):
         claim = "r"
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q')]
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (0, 0)], 'p', 'p')]
         self.assertEqual(applic, exp)
 
     def test_applicable_rules4(self):
@@ -105,19 +112,23 @@ class RuleTestCase(ut.TestCase):
         claim = "s"
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2,0), (0,1)], 'p', 'q')]
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2,0), (0,1)], 'p', 'q'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(2, 0), (2, 0)], 'p', 'p')]
         self.assertEqual(applic, exp)
 
 
 class RuleDictTestCase(ut.TestCase):
 
-    # def test_conjunction_rule(self):
-    #     args = ["p", "q"]
-    #     claim = "p & q"
-    #     state = sh.pack(args, claim, [])
-    #     applic = rh.applicable_rules(state)
-    #     exp = [(('Conjunction', ['a', 'b'], 'a & b'), [(0,0), (1,1)], 'p', 'q')]
-    #     self.assertEqual(applic, exp)
+    def test_conjunction_rule(self):
+        args = ["p", "q"]
+        claim = "p & q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (0, 0)], 'p', 'p'), 
+               (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (1, 0)], 'p', 'q'), 
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (0, 0)], 'q', 'p'), 
+               (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (1, 0)], 'q', 'q')]
+        self.assertEqual(applic, exp)
 
     def test_modus_tollens_rule(self):
         args = ["~p", "q -> p"]
@@ -132,7 +143,8 @@ class RuleDictTestCase(ut.TestCase):
         claim = "q"
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q')]
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (0, 0)], 'p', 'p')]
         self.assertEqual(applic, exp)
 
     def test_simplification_rule(self):
@@ -140,7 +152,8 @@ class RuleDictTestCase(ut.TestCase):
         claim = "q"
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
-        exp = [(('Simplification', ['a & b'], 'a'), [(0,0)], 'p', 'q'), (('Simplification', ['a & b'], 'b'), [(0,0)], 'p', 'q')]
+        exp = [(('Simplification', ['a & b'], 'a'), [(0,0)], 'p', 'q'), 
+               (('Simplification', ['a & b'], 'b'), [(0,0)], 'p', 'q')]
         self.assertEqual(applic, exp)
 
     def test_disjunctive_syllogism_rule(self):
