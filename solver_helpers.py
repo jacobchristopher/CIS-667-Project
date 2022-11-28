@@ -54,9 +54,12 @@ def apply_rule(rule: tuple, state: tuple) -> tuple:
     return pack(args, claim, hist)
 
 #-------------------------------------------------------------------------
+
+# Packs the state into a hashable object
 def pack(args, claim, hist):
         return (tuple(args), claim, tuple(hist))
 
+# Unpacks the state into a mutable object
 def unpack(state):
     args, claim, hist = state
     return list(args), claim, list(hist)

@@ -79,6 +79,7 @@ def convert_to_complex(expr: str, a: str, b:str) -> str:
 
 #--------------------------------------------------------------
 
+# Dictionary of currently implemented inference rules
 rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"), 
              ("Modus Tollens", ["~b", "a -> b"], "~a"),
              ("Simplification", ["a & b"], "a"),
@@ -121,6 +122,7 @@ def applicable_rules(state: tuple) -> list:
         can_apply.extend(arg_pairings)
     return can_apply
 
+# A helper method for applicable_rules()
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
     if name == "Conjunction": return conjuntion_pairs(cond_index, rules)        # Special Case #1
@@ -129,6 +131,7 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
 
 # ---------------------------------------------------------------
 
+# Groups conditions for conjungation rule
 def conjuntion_pairs(cond_index: list, rules: tuple) -> list:
     pairing_list = []
     for x in cond_index:
@@ -144,6 +147,7 @@ def conjuntion_pairs(cond_index: list, rules: tuple) -> list:
                 pairing_list.append(elem)
     return pairing_list
 
+# Groups conditions for modus ponens rule
 def modus_ponens_pairs(cond_index: list, rules: tuple) -> list:
     (name, rule_args, cond) = rules
     pairing_list = []
@@ -159,6 +163,7 @@ def modus_ponens_pairs(cond_index: list, rules: tuple) -> list:
                 pairing_list.append((y, x))
     return pairing_list_parser(pairing_list, rules)
 
+# Catch all condition grouper for those without a special definition
 def standard_pairs(cond_index: list, rules: tuple) -> list:
     (name, rule_args, cond) = rules
     pairing_list = []
@@ -173,7 +178,7 @@ def standard_pairs(cond_index: list, rules: tuple) -> list:
         pairing_list.append(tuple(common_rules))
     return pairing_list_parser(pairing_list, rules)
 
-
+# Formatter for condition groupers
 def pairing_list_parser(pairing_list: list, rules: tuple) -> list:
     (name, rule_args, cond) = rules
     final_list = []
@@ -202,6 +207,7 @@ def pairing_list_parser(pairing_list: list, rules: tuple) -> list:
 
 # ---------------------------------------------------------------
 
+# Tuple parsing helper function
 def take_2_of_4_mapper(lst: list) -> list:
     rtrn_lst = []
     for i in range(len(lst)):
@@ -209,6 +215,7 @@ def take_2_of_4_mapper(lst: list) -> list:
         rtrn_lst.append((one, two))
     return rtrn_lst
 
+# Tuple parsing helper function
 def take_1_of_2_mapper(lst: list) -> list:
     rtrn_lst = []
     for i in range(len(lst)):
@@ -216,6 +223,7 @@ def take_1_of_2_mapper(lst: list) -> list:
         rtrn_lst.append(one)
     return rtrn_lst
 
+# Parenthesis parsing helper function
 def unwrapped(exp: str) -> str:
     if exp[0:1] == "(":
         end = find_end_paren(exp, 0)
