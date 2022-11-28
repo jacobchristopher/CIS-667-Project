@@ -6,44 +6,47 @@ import solver_helpers as sh
 # Parse into tuple containing
 #   1. The simplified expression
 #   2. The original terms in the expression
-def parse_expression(exp: str) -> tuple:  
-    # Check if first term is paren
+def parse_expression(exp: str) -> tuple: 
+    # 'a' 
     astart = 0
     aend = 1
     negation_a = False
-
     # Check for negation
     if exp[astart:aend] == "~":
         negation_a = True
         astart += 1
         aend += 1
-
+    # Parse expression a
     if exp[(aend-1):aend] == "(":
         aend = find_end_paren(exp, astart)
+        # if aend == len(exp):    # Catch when entire
+        #     astart += 1         # Expression wrapped in parens
+        #     aend -= 1
+        #     print(exp[astart:aend])
+        #     parse_expression(exp[astart:aend])
     a = exp[astart:aend]
-
+    # Term
     tstart = aend+1
     term = exp[tstart:tstart+1]
+    # Parse operator (if exists)
     if term == "-":
         term = "->"
         tstart += 1
     tend = tstart+1
-
+    # 'b'
     bstart = tend+1
     bend = bstart+1
-
     negation_b = False
-
     # Check for negation
     if exp[bstart:bend] == "~":
         negation_b = True
         bstart += 1
         bend += 1
-
+    # Parse expression b
     if exp[bstart:bend] == "(":
         bend = find_end_paren(exp, bstart)
     b = exp[bstart:bend]
-
+    # Format into output
     simplified = ""
     if negation_a:
         simplified += "~"
@@ -125,6 +128,10 @@ def applicable_rules(state: tuple) -> list:
 
 
 # TODO: Fix to work with rules that have more than a,b values
+# Split up into format:
+#       if name == "Conjunction": return conjungation_pairs()
+#       elif name == "xyz": return xyz_pairs()
+#       else: return common_pairs()
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
     pairing_list = [] # (a, b, c, )
@@ -135,6 +142,10 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
             a = x[2]
             for y in cond_index:
                 b = y[2]
+                if len(a) != 1:
+                    a = "(" + unwrapped(a) + ")"
+                if len(b) != 1:
+                    "(" + unwrapped(b) + ")"
                 elem = (rules, take_2_of_4_mapper([x,y]), a, b)
                 if elem not in pairing_list:
                     pairing_list.append(elem)
@@ -168,7 +179,7 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
                     index += 1
                 else:
                     break
-            elem = (rules, take_2_of_4_mapper(list(x)), a, b)
+            elem = (rules, take_2_of_4_mapper(list(x)), unwrapped(a), unwrapped(b))
             if elem not in final_list:
                 final_list.append(elem)
     return final_list
@@ -188,3 +199,10 @@ def take_1_of_2_mapper(lst: list) -> list:
         (one, two) = lst[i]
         rtrn_lst.append(one)
     return rtrn_lst
+
+def unwrapped(exp: str) -> str:
+    if exp[0:1] == "(":
+        end = find_end_paren(exp, 0)
+        if end == len(exp):
+            return exp[1:end-1]
+    return exp

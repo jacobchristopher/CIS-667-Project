@@ -1,6 +1,7 @@
 import unittest as ut
 import solver_helpers as sh
 import rule_helpers as rh
+import queue_search as qs
 
 class HelperTestCase(ut.TestCase):
 
@@ -165,6 +166,25 @@ class RuleDictTestCase(ut.TestCase):
         self.assertEqual(applic, exp)
 
 
+class QueueSearchTestCase(ut.TestCase):
+
+    def test_solve_implication_bfs(self):
+        args = ["p -> (q -> r)", "p", "q"]
+        final_args = ["p -> (q -> r)", "p", "q", "q -> r", "r"]
+        claim = "r"
+        final_hist = [('Modus Ponens', (1, 0), 3), ('Modus Ponens', (2, 3), 4)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.breadth_first_search(problem)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
+
+
 
 # Note that __main__ is written based on test function implementation
 # from the following source.
@@ -174,7 +194,7 @@ class RuleDictTestCase(ut.TestCase):
 if __name__ == "__main__":
 
     num, errs, fails = 0, 0, 0
-    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase]
+    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase, QueueSearchTestCase]
     
     for test_case in test_cases:
         test_suite = ut.TestLoader().loadTestsFromTestCase(test_case)
