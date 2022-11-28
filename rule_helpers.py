@@ -19,11 +19,6 @@ def parse_expression(exp: str) -> tuple:
     # Parse expression a
     if exp[(aend-1):aend] == "(":
         aend = find_end_paren(exp, astart)
-        # if aend == len(exp):    # Catch when entire
-        #     astart += 1         # Expression wrapped in parens
-        #     aend -= 1
-        #     print(exp[astart:aend])
-        #     parse_expression(exp[astart:aend])
     a = exp[astart:aend]
     # Term
     tstart = aend+1
@@ -126,31 +121,47 @@ def applicable_rules(state: tuple) -> list:
         can_apply.extend(arg_pairings)
     return can_apply
 
-
-# TODO: Fix to work with rules that have more than a,b values
-# Split up into format:
-#       if name == "Conjunction": return conjungation_pairs()
-#       elif name == "xyz": return xyz_pairs()
-#       else: return common_pairs()
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
-    pairing_list = [] # (a, b, c, )
-    #print(cond_index)
-    # Special Case #1
-    if name == "Conjunction":
-        for x in cond_index:
-            a = x[2]
-            for y in cond_index:
-                b = y[2]
-                if len(a) != 1:
-                    a = "(" + unwrapped(a) + ")"
-                if len(b) != 1:
-                    "(" + unwrapped(b) + ")"
-                elem = (rules, take_2_of_4_mapper([x,y]), a, b)
-                if elem not in pairing_list:
-                    pairing_list.append(elem)
-        return pairing_list
-    # Standard Case
+    if name == "Conjunction": return conjuntion_pairs(cond_index, rules)        # Special Case #1
+    elif name == "Modus Ponens": return modus_ponens_pairs(cond_index, rules)   # Special Case #2
+    else: return standard_pairs(cond_index, rules)                              # Standard Case
+
+# ---------------------------------------------------------------
+
+def conjuntion_pairs(cond_index: list, rules: tuple) -> list:
+    pairing_list = []
+    for x in cond_index:
+        a = x[2]
+        for y in cond_index:
+            b = y[2]
+            if len(a) != 1:
+                a = "(" + unwrapped(a) + ")"
+            if len(b) != 1:
+                "(" + unwrapped(b) + ")"
+            elem = (rules, take_2_of_4_mapper([x,y]), a, b)
+            if elem not in pairing_list:
+                pairing_list.append(elem)
+    return pairing_list
+
+def modus_ponens_pairs(cond_index: list, rules: tuple) -> list:
+    (name, rule_args, cond) = rules
+    pairing_list = []
+    rule_a = []
+    for x in cond_index:
+        if x[3] == "":
+            rule_a.append(x)
+    for x in cond_index:
+        a = x[2]
+        b = x[3]
+        for y in rule_a:
+            if y[2] == a and b != "":
+                pairing_list.append((y, x))
+    return pairing_list_parser(pairing_list, rules)
+
+def standard_pairs(cond_index: list, rules: tuple) -> list:
+    (name, rule_args, cond) = rules
+    pairing_list = []
     for x in cond_index:
         common_rules = []
         a = x[2]
@@ -160,6 +171,11 @@ def find_common_pairings(rules: tuple, cond_index: list) -> list:
                 if y[3] == b or b == "":
                     if y not in common_rules: common_rules.append(y)
         pairing_list.append(tuple(common_rules))
+    return pairing_list_parser(pairing_list, rules)
+
+
+def pairing_list_parser(pairing_list: list, rules: tuple) -> list:
+    (name, rule_args, cond) = rules
     final_list = []
     for x in pairing_list:
         if len(x) == len(rule_args):

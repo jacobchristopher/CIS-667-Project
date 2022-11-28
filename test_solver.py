@@ -165,6 +165,16 @@ class RuleDictTestCase(ut.TestCase):
         exp = [(('Disjunctive Syllogism', ['a | b', '~a'], 'b'), [(0, 0), (1, 1)], 'p', 'q')]
         self.assertEqual(applic, exp)
 
+    def test_mult_implication_rule(self):
+        args = ["p -> q", "p -> r", "p"]
+        claim = "q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2, 0), (0, 1)], 'p', 'q'),
+               (('Modus Ponens', ['a', 'a -> b'], 'b'), [(2, 0), (1, 1)], 'p', 'r'),
+               (('Conjunction', ['a', 'b'], 'a & b'), [(2, 0), (2, 0)], 'p', 'p')]
+        self.assertEqual(applic, exp)
+
 
 class QueueSearchTestCase(ut.TestCase):
 
@@ -184,6 +194,41 @@ class QueueSearchTestCase(ut.TestCase):
         self.assertEqual(args, final_args)
         self.assertEqual(hist, final_hist)
 
+    def test_solve_conjunction_bfs(self):
+        args = ["p -> q", "s -> r", "p", "s"]
+        final_args = ["p -> q", "s -> r", "p", "s", "q", "r", "r & q"]
+        claim = "r & q"
+        final_hist = [('Modus Ponens', (2, 0), 4),
+                      ('Modus Ponens', (3, 1), 5),
+                      ('Conjunction', (5, 4), 6)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.breadth_first_search(problem)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
+
+    def test_solve_mult_implication_bfs(self):
+        args = ["p -> q", "p -> r", "p"]
+        final_args = ["p -> q", "p -> r", "p", "q", "r", "r & q"]
+        claim = "r & q"
+        final_hist = [('Modus Ponens', (2, 0), 3),
+                      ('Modus Ponens', (2, 1), 4),
+                      ('Conjunction', (4, 3), 5)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.breadth_first_search(problem)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
 
 
 # Note that __main__ is written based on test function implementation
