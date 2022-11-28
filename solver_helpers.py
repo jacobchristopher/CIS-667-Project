@@ -1,4 +1,5 @@
 import rule_helpers as rh
+import numpy as np
 
 # The state of the problem will be represented by a tuple with three elements:
 #
@@ -15,12 +16,12 @@ import rule_helpers as rh
 
 # Create the intial state tuple based on the argument and claim input
 def initial_state(arguments: list, claim: str) -> tuple:
-    return (arguments, claim, [])
+    return pack(arguments, claim, [])
 
 
 # Check if the goal state has been reached
 def proof_complete(state: tuple) -> bool:
-    (args, claim, hist) = state
+    (args, claim, hist) = unpack(state)
     return claim in args
 
 
@@ -34,20 +35,31 @@ def proof_complete(state: tuple) -> bool:
 # - index:  A list of the indices of the element of args that this rule 
 #           applies to.
 def valid_actions(state: tuple) -> list:
-    #TODO: Find way to convert this to the canonical form described abive
     return rh.applicable_rules(state)
 
 
 # Update the state by applying the given rule
 def apply_rule(rule: tuple, state: tuple) -> tuple:
-    (args, claim, hist) = state
+    (args, claim, hist) = unpack(state)
     (form, indices, a, b) = rule
     (name, pattern, concl) = form
 
     # Add to the hist element; tuple contains name of rule, indices that are 
     # referenced, and the index that the new arg will be added at
     # Note: Not storing index in rule in history (as it is sorted)
-    hist.append((name, rh.take_1_of_2_mapper(indices), len(args)))
+    # FIXME: Add this conversion to (and from) tuple into pack/unpack?
+    hist.append((name, tuple(rh.take_1_of_2_mapper(indices)), len(args)))
     result = rh.convert_to_complex(concl, a, b)
     args.append(result)
-    return (args, claim, hist)
+    return pack(args, claim, hist)
+
+#-------------------------------------------------------------------------
+
+# Packs the state into a hashable object
+def pack(args, claim, hist):
+        return (tuple(args), claim, tuple(hist))
+
+# Unpacks the state into a mutable object
+def unpack(state):
+    args, claim, hist = state
+    return list(args), claim, list(hist)
