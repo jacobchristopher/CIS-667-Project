@@ -87,7 +87,8 @@ rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"),
              ("Conjunction", ["a", "b"], "a & b"),
              ("Disjunctive Syllogism", ["a | b", "~a"], "b"),
              ("Disjunctive Syllogism", ["a | b", "~b"], "a"),
-             #("Hypothetical Syllogism", ["a -> b", "b -> c"], "a -> c"),
+             ("Hypothetical Syllogism", ["a -> b"], "a -> b"),  # a -> b, b -> c = a -> c
+                                                                # Handled in parser
              #("Double Negation", ["~~a"], "a"),
             ]
 
@@ -125,9 +126,11 @@ def applicable_rules(state: tuple) -> list:
 # A helper method for applicable_rules()
 def find_common_pairings(rules: tuple, cond_index: list) -> list:
     (name, rule_args, cond) = rules
-    if name == "Conjunction": return conjuntion_pairs(cond_index, rules)        # Special Case #1
-    elif name == "Modus Ponens": return modus_ponens_pairs(cond_index, rules)   # Special Case #2
-    else: return standard_pairs(cond_index, rules)                              # Standard Case
+    if name == "Conjunction": return conjuntion_pairs(cond_index, rules)                            # Special Case #1
+    elif name == "Modus Ponens": return modus_ponens_pairs(cond_index, rules)                       # Special Case #2
+    elif name == "Modus Tollens": return modus_tollens_pairs(cond_index, rules)                     # Special Case #3
+    elif name == "Hypothetical Syllogism": return hypothetical_syllogism_pairs(cond_index, rules)   # Special Case #4
+    else: return standard_pairs(cond_index, rules)                                                  # Standard Case
 
 # ---------------------------------------------------------------
 
@@ -162,6 +165,37 @@ def modus_ponens_pairs(cond_index: list, rules: tuple) -> list:
             if y[2] == a and b != "":
                 pairing_list.append((y, x))
     return pairing_list_parser(pairing_list, rules)
+
+# Groups conditions for modus ponens rule
+def modus_tollens_pairs(cond_index: list, rules: tuple) -> list:
+    (name, rule_args, cond) = rules
+    pairing_list = []
+    rule_a = []
+    for x in cond_index:
+        if x[2] == "":
+            rule_a.append(x)
+    for x in cond_index:
+        a = x[2]
+        b = x[3]
+        for y in rule_a:
+            if y[3] == b and a != "":
+                pairing_list.append((y, x))
+    return pairing_list_parser(pairing_list, rules)
+
+# Groups conditions for hypothetical syllogism rule
+def hypothetical_syllogism_pairs(cond_index: list, rules: tuple) -> list:
+    (name, rule_args, cond) = rules
+    pairing_list = []
+    rule_a = []
+    for x in cond_index:
+        for y in cond_index:
+            a = x[2]
+            b = y[3]
+            if y[2] == x[3]:
+                elem = (rules, take_2_of_4_mapper([x,y]), a, b)
+                if elem not in pairing_list:
+                    pairing_list.append(elem)
+    return pairing_list
 
 # Catch all condition grouper for those without a special definition
 def standard_pairs(cond_index: list, rules: tuple) -> list:
