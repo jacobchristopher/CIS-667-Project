@@ -1,5 +1,4 @@
 import rule_helpers as rh
-import numpy as np
 
 # The state of the problem will be represented by a tuple with three elements:
 #
