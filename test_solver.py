@@ -105,7 +105,8 @@ class RuleTestCase(ut.TestCase):
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(0,0), (1,1)], 'p', 'q'),
-               (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (0, 0)], 'p', 'p')]
+               (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (0, 0)], 'p', 'p'),
+               (('Hypothetical Syllogism', ['a -> b'], 'a -> b'), [(1, 0), (2, 0)], 'p', 'r')]
         self.assertEqual(applic, exp)
 
     def test_applicable_rules4(self):
@@ -114,7 +115,9 @@ class RuleTestCase(ut.TestCase):
         state = sh.pack(args, claim, [])
         applic = rh.applicable_rules(state)
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2,0), (0,1)], 'p', 'q'),
-               (('Conjunction', ['a', 'b'], 'a & b'), [(2, 0), (2, 0)], 'p', 'p')]
+               (('Conjunction', ['a', 'b'], 'a & b'), [(2, 0), (2, 0)], 'p', 'p'),
+               (('Hypothetical Syllogism', ['a -> b'], 'a -> b'), [(0, 0), (1, 0)], 'p', 'r'),
+               (('Hypothetical Syllogism', ['a -> b'], 'a -> b'), [(1, 0), (3, 0)], 'q', 's')]
         self.assertEqual(applic, exp)
 
 
@@ -129,14 +132,6 @@ class RuleDictTestCase(ut.TestCase):
                (('Conjunction', ['a', 'b'], 'a & b'), [(0, 0), (1, 0)], 'p', 'q'), 
                (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (0, 0)], 'q', 'p'), 
                (('Conjunction', ['a', 'b'], 'a & b'), [(1, 0), (1, 0)], 'q', 'q')]
-        self.assertEqual(applic, exp)
-
-    def test_modus_tollens_rule(self):
-        args = ["~p", "q -> p"]
-        claim = "~q"
-        state = sh.pack(args, claim, [])
-        applic = rh.applicable_rules(state)
-        exp = [(('Modus Tollens', ['~b', 'a -> b'], '~a'), [(0, 0), (1, 1)], 'q', 'p')]
         self.assertEqual(applic, exp)
 
     def test_modus_ponens_rule(self):
@@ -173,6 +168,14 @@ class RuleDictTestCase(ut.TestCase):
         exp = [(('Modus Ponens', ['a', 'a -> b'], 'b'), [(2, 0), (0, 1)], 'p', 'q'),
                (('Modus Ponens', ['a', 'a -> b'], 'b'), [(2, 0), (1, 1)], 'p', 'r'),
                (('Conjunction', ['a', 'b'], 'a & b'), [(2, 0), (2, 0)], 'p', 'p')]
+        self.assertEqual(applic, exp)
+
+    def test_modus_tollens_rule(self):
+        args = ["~p", "q -> p"]
+        claim = "~q"
+        state = sh.pack(args, claim, [])
+        applic = rh.applicable_rules(state)
+        exp = [(('Modus Tollens', ['~b', 'a -> b'], '~a'), [(0, 0), (1, 1)], 'q', 'p')]
         self.assertEqual(applic, exp)
 
 
@@ -219,6 +222,40 @@ class QueueSearchTestCase(ut.TestCase):
         final_hist = [('Modus Ponens', (2, 0), 3),
                       ('Modus Ponens', (2, 1), 4),
                       ('Conjunction', (4, 3), 5)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.breadth_first_search(problem)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
+
+    def test_solve_modus_tollens_bfs(self):
+        args = ["p -> q", "q -> r", "~r"]
+        final_args = ['p -> q', 'q -> r', '~r', '~q', '~p']
+        claim = "~p"
+        final_hist = [('Modus Tollens', (2, 1), 3), 
+                      ('Modus Tollens', (3, 0), 4)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.breadth_first_search(problem)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
+
+    def test_solve_hypothetical_syllogism_bfs(self):
+        args = ["p -> q", "q -> r", "r -> s"]
+        final_args = ['p -> q', 'q -> r', 'r -> s', 'p -> r', 'p -> s']
+        claim = "p -> s"
+        final_hist = [('Hypothetical Syllogism', (0, 1), 3),
+                      ('Hypothetical Syllogism', (3, 2), 4)]
         state = sh.initial_state(args, claim)
         problem = qs.SearchProblem(state, sh.proof_complete)
         plan, node_count = qs.breadth_first_search(problem)
