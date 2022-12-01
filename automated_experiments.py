@@ -20,7 +20,7 @@ import baseline_ai as baseline
 # below to True for version that runs in under two minutes. Change the constant
 # below to False for full version (batch sizes of 100).
 
-LIMITED_BATCHES = True
+LIMITED_BATCHES = False
 
 class AutomatedExperiments:
 
