@@ -22,7 +22,12 @@ The output will be a formatted proof indicating which rules were applied to reac
 
 # Computer Experiements
 
-All automated testing is handled by test_solver.py. This program runs a series of unit tests that target specific aspects of the domain as well as several "black-box" test that provide input to the solver and validate the expected series of rules matches those taken by the AI to reach the goal state.
+Automated computer experiments can be run using automated_experiments.py. These experiments compare the efficiency of three AI implementations: baseline (random selection), Breadth First Search, and A* Search. There are two options when running these experiments:
+
+- To run full set of tests (5 batches of 100, increasing in complexity), set constant LIMITED_BATCHES to False. This version takes roughly an hour to finish.
+- To run set of tests with reduced batch sizes (specifically for the more complex problems), set constant LIMITED_BATCHES to true. This version runs in under five minutes.
+
+The program will display a printed output of the average number of nodes used by each of the search algorithms, the number of steps each algorithm takes to reach the goal state, and the number of failures that the baseline AI has (as the number of actions are limited).
 
 
 # Code Attributions
