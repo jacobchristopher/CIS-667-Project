@@ -190,7 +190,6 @@ class QueueSearchTestCase(ut.TestCase):
         state = sh.initial_state(args, claim)
         problem = qs.SearchProblem(state, sh.proof_complete)
         plan, node_count = qs.breadth_first_search(problem)
-        print(node_count)
         states = [problem.initial_state]
         for a in range(len(plan)):
             states.append(sh.apply_rule(plan[a], states[-1]))
@@ -269,6 +268,23 @@ class QueueSearchTestCase(ut.TestCase):
         self.assertEqual(args, final_args)
         self.assertEqual(hist, final_hist)
 
+    def test_solve_disjunctive_bfs(self):
+        args = ["p -> (q | r)", "p", "~r"]
+        final_args = ['p -> (q | r)', 'p', '~r', 'q | r', 'q']
+        claim = "q"
+        final_hist = [('Modus Ponens', (1, 0), 3), 
+                      ('Disjunctive Syllogism', (3, 2), 4)]
+        state = sh.initial_state(args, claim)
+        problem = qs.SearchProblem(state, sh.proof_complete)
+        plan, node_count = qs.a_star_search(problem, astar.simple_heuristic)
+        states = [problem.initial_state]
+        for a in range(len(plan)):
+            states.append(sh.apply_rule(plan[a], states[-1]))
+        final_state = states[len(states)-1]
+        (args, claim, hist) = sh.unpack(final_state)
+        self.assertEqual(args, final_args)
+        self.assertEqual(hist, final_hist)
+
     def test_solve_implication_astar(self):
         args = ["p -> (q -> r)", "p", "q"]
         final_args = ["p -> (q -> r)", "p", "q", "q -> r", "r"]
@@ -277,7 +293,6 @@ class QueueSearchTestCase(ut.TestCase):
         state = sh.initial_state(args, claim)
         problem = qs.SearchProblem(state, sh.proof_complete)
         plan, node_count = qs.a_star_search(problem, astar.simple_heuristic)
-        print(node_count)
         states = [problem.initial_state]
         for a in range(len(plan)):
             states.append(sh.apply_rule(plan[a], states[-1]))
