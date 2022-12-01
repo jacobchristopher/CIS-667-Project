@@ -89,6 +89,8 @@ rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"),
              ("Disjunctive Syllogism", ["a | b", "~b"], "a"),
              ("Hypothetical Syllogism", ["a -> b"], "a -> b"),  # a -> b, b -> c = a -> c
                                                                 # Handled in parser
+             #("Addition", ["a"], "a | b"),
+             #("Resolution", ["a | b", "~a | c"], "a | c"),
              #("Double Negation", ["~~a"], "a"),
             ]
 
