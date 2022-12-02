@@ -52,5 +52,6 @@ The program will display a printed output of the average number of nodes used by
 The files queue_search.py and sections of test_solver.py levarage implementations from the following sources:
 
 Katz, Garrett. "queue_search_code.py." Homework 01. CIS 667, Fall 2022.
+
 Katz, Garrett. "roomba_heuristic_test.py." Homework 01. CIS 667, Fall 2022.
 
