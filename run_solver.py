@@ -6,7 +6,7 @@ import baseline_ai as baseline
 import sys
 
 def read_arg_input() -> tuple:
-    print("------ Welcome to Logical Inference Solver ------\n")
+    print("\n------ Welcome to Logical Inference Solver ------\n")
     print("Follow the prompts to begin.\n")
     
     print("Enter the number corresponding to the AI you would like to use: \n")
