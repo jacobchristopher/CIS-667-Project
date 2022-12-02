@@ -51,7 +51,14 @@ The program will display a printed output of the average number of nodes used by
 
 The files queue_search.py and sections of test_solver.py levarage implementations from the following sources:
 
+Hunter, J. D. "Matplotlib: A 2D Graphics Environment." Computing in Science & Engineering, vol. 9, no. 3, 2007, pp. 90-95.
+
+Harris, C.R., Millman, K.J., et al. Array programming with NumPy. Nature 585, 2020, pp. 357–362. https://doi.org/10.1038/s41586-020-2649-2
+
 Katz, Garrett. "queue_search_code.py." Homework 01. CIS 667, Fall 2022.
 
 Katz, Garrett. "roomba_heuristic_test.py." Homework 01. CIS 667, Fall 2022.
 
+Newell, A., et al. “Empirical explorations of the logic theory machine: a case study in heuristic.” Western Joint Computer Conference: Techniques for reliability, February 26-28, 1957. Association for Computing Machinery, New York, NY, USA, pp. 218–230, February 26, 1957. https://doi.org/10.1145/1455567.1455605
+
+Paszke, A., Gross, S., et al. PyTorch: An Imperative Style, High-Performance Deep Learning Library. Advances in Neural Information Processing Systems 32, Curran Associates, Inc., pp. 8024–8035. http://papers.neurips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library.pdf
