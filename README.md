@@ -34,7 +34,7 @@ Automated computer experiments can be run using automated_experiments.py. These 
 - To run full set of tests (5 batches of 100, increasing in complexity), set constant LIMITED_BATCHES to False. This version takes roughly fifteen minutes to run.
 - To run set of tests with reduced batch sizes (specifically for the more complex problems), set constant LIMITED_BATCHES to true. This version runs in about two minutes.
 
-The program will display a printed output of the average number of nodes used by each of the search algorithms, the number of steps each algorithm takes to reach the goal state, and the number of failures that the baseline AI has (as the number of actions are limited).
+The program will display a printed output of the average number of nodes used by each of the search algorithms, the number of steps each algorithm takes to reach the goal state, and the number of failures that the baseline AI has (as the number of actions are limited). It will also generate histogram plots for the node and step counts that are displayed.
 
 
 # Code Attributions
