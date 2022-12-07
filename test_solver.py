@@ -3,6 +3,9 @@ import solver_helpers as sh
 import rule_helpers as rh
 import queue_search as qs
 import a_star_heuristic as astar
+import neural_network as nn
+import numpy as np
+import numpy.testing as npt
 
 class HelperTestCase(ut.TestCase):
 
@@ -302,6 +305,26 @@ class QueueSearchTestCase(ut.TestCase):
         self.assertEqual(hist, final_hist)
 
 
+class NeuralNetworkTestCase(ut.TestCase):
+
+    def test_one_hot_simple(self):
+        args = ["p -> (q -> r)", "p", "q"]
+        claim = "r"
+        state = sh.initial_state(args, claim)       
+        encoded = nn.one_hot_encoding(state)
+        exp_encoding = np.array(
+            [['01000000', '10000010', '11000000', '00100000', '10000010', '00010000', '10100000', '00000000'],
+             ['01000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
+             ['00100000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
+             ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
+             ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
+             ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
+             ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'], 
+             ['00010000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000']],
+             dtype=object)
+        npt.assert_array_equal(encoded, exp_encoding)
+
+
 # Note that __main__ is written based on test function implementation
 # from the following source.
 #   Title:          roomba_heuristic_test.py
@@ -310,7 +333,7 @@ class QueueSearchTestCase(ut.TestCase):
 if __name__ == "__main__":
 
     num, errs, fails = 0, 0, 0
-    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase, QueueSearchTestCase]
+    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase, QueueSearchTestCase, NeuralNetworkTestCase]
     
     for test_case in test_cases:
         test_suite = ut.TestLoader().loadTestsFromTestCase(test_case)
