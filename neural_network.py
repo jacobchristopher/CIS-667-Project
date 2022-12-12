@@ -10,6 +10,7 @@ import queue_search as qs
 import a_star_heuristic as astar
 import torch as tr
 import matplotlib.pyplot as plt
+import time
 
 # A mechanism for one-hot encoding. A few key limitations:
 #   - Max number of args is seven
@@ -150,31 +151,32 @@ def train_nn():
         tr.nn.Linear(8, 64000),
         tr.nn.ReLU(),
         tr.nn.Flatten(),
-        tr.nn.Linear(8192000, 100),
+        tr.nn.Linear(8192000, 64),
+        tr.nn.MaxPool1d(64),
+        tr.nn.ReLU()
     )
 
-    #nn = LinNet(size=5, hid_features=16)
-
-    loss_fn = tr.nn.CrossEntropyLoss()
-    optimizer = tr.optim.SGD(nn.parameters(), lr=1e-1)
+    optimizer = tr.optim.SGD(nn.parameters(), lr=1e-2)
 
     # Training Data
-    training_set = generate_data(count=100)
+    print("\nCreating training data...\n")
+    training_set = generate_data(count=200)
     states, utilities = training_set
     training_batch = tr.stack(tuple(map(one_hot_encoding, states))), tr.tensor(utilities)
 
     # Testing Data
+    print("Creating testing data...\n")
     testing_set = generate_data(count=50)
     states, utilities = testing_set
     testing_batch = tr.stack(tuple(map(one_hot_encoding, states))), tr.tensor(utilities)
 
     # Run the gradient descent iterations
+    print("Running gradient descent...\n")
     curves = [], []
-    for epoch in range(500):
+    start = time.time()
+    for epoch in range(15):
     
-        # zero out the gradients for the next backward pass
         optimizer.zero_grad()
-
         e = batch_error(nn, training_batch)
         e.backward()
         training_error = e.item()
@@ -183,19 +185,29 @@ def train_nn():
             e = batch_error(nn, testing_batch)
             testing_error = e.item()
 
-        # take the next optimization step
+        # Optimization step
         optimizer.step()    
         
-        # print/save training progress
-        if epoch % 5 == 0:
-            print("%d: %f, %f" % (epoch, training_error, testing_error))
+        # Print/Save training progress
+        if epoch % 1 == 0:
+            end = time.time()
+            print("%d: %f, %f, time elapsed: %f" % (epoch, training_error, testing_error, (end-start)))
         curves[0].append(training_error)
         curves[1].append(testing_error)
 
-    # visualize learning curves on train/test data
+    # Remove data outlier (to make graph readable)
+    curves[0].pop(1)
+    curves[1].pop(1)
+
+    # Plot learning curves
     plt.plot(curves[0], 'b-')
     plt.plot(curves[1], 'r-')
-    #plt.plot([0, len(curves[1])], [baseline_error, baseline_error], 'g-')
     plt.plot()
     plt.legend(["Train","Test"])
     plt.show()
+
+    # Save torch model
+    tr.save(nn, "saved_net.pt")
+
+if __name__ == "__main__":
+    train_nn()
