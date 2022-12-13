@@ -38,6 +38,7 @@ class AutomatedExperiments:
         problem = qs.SearchProblem(state, sh.proof_complete)
         plan_bfs, node_count_bfs = qs.breadth_first_search(problem)
         plan_astar, node_count_astar = qs.a_star_search(problem, astar.simple_heuristic)
+        plan_astar_nn, node_count_astar_nn = qs.a_star_search(problem, astar.nn_heuristic)
 
         # -- Run AI --
 
@@ -46,15 +47,21 @@ class AutomatedExperiments:
         for a in range(len(plan_bfs)):
             states_bfs.append(sh.apply_rule(plan_bfs[a], states_bfs[-1]))
 
-        # A* Search
+        # A* Search (Simple)
         states_astar = [problem.initial_state]
         for a in range(len(plan_astar)):
             states_astar.append(sh.apply_rule(plan_astar[a], states_astar[-1]))
 
+        # A* Search (Neural Net)
+        states_astar_nn = [problem.initial_state]
+        for a in range(len(plan_astar_nn)):
+            states_astar_nn.append(sh.apply_rule(plan_astar_nn[a], states_astar_nn[-1]))
+
+
         # Baseline AI
         (state_baseline, solved, steps) = baseline.apply_random_actions(state, count=baseline_depth)
 
-        return (states_bfs, node_count_bfs), (states_astar, node_count_astar), (state_baseline, steps, solved)
+        return (states_bfs, node_count_bfs), (states_astar, node_count_astar), (state_baseline, steps, solved), (states_astar_nn, node_count_astar_nn)
 
 def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth = 100, batch_size = 100) -> tuple:
     # BFS Analysis
@@ -63,6 +70,8 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
     # A* Analysis
     node_count_astar = 0
     node_dist_astar = []
+    node_count_astar_nn = 0
+    node_dist_astar_nn = []
     # General Search Analysis
     step_count_search = 0
     step_dist_search = []
@@ -72,16 +81,18 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
     step_dist_baseline = []
 
     for i in range(batch_size):
-        bfs, a_star, base = AutomatedExperiments.run_experiment(args, claim_depth, baseline_depth)
+        bfs, a_star, base, a_star_nn = AutomatedExperiments.run_experiment(args, claim_depth, baseline_depth)
         # Node Counts
         node_count_bfs += bfs[1]
         node_count_astar += a_star[1]
+        node_count_astar_nn += a_star_nn[1]
         # Step Counts
         step_count_baseline += base[1]
         step_count_search += len(bfs[0])
         # Distributions
         node_dist_bfs.append(bfs[1])
         node_dist_astar.append(a_star[1])
+        node_dist_astar_nn.append(a_star_nn[1])
         step_dist_search.append(len(bfs[0]))
         step_dist_baseline.append(base[1])
         # Failures
@@ -91,12 +102,15 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
     avg_step_search = step_count_search /batch_size
     avg_node_astar = node_count_astar / batch_size
     avg_step_base = step_count_baseline / batch_size
+    avg_node_astar_nn = node_count_astar_nn / batch_size
 
     print(formatted_title
           + str(avg_node_bfs) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_bfs))+len(str(avg_step_search)))
-          + "                              "
+          + "                        "
           + str(avg_node_astar) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_astar))+len(str(avg_step_search)))
-          + "                            "
+          + "                      "
+          + str(avg_node_astar_nn) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_astar_nn))+len(str(avg_step_search)))
+          + "                      "
           + str(avg_step_base) + ", " + str(baseline_failures) + " failures" +"\n")
 
     return (node_dist_bfs, node_dist_astar, step_dist_search, step_dist_baseline)
@@ -149,7 +163,7 @@ def print_padding(size: int) -> str:
 
 if __name__ == "__main__":
 
-    print("\n                 BFS Node Count (nodes, steps)            A* Node Count (nodes, steps)            Baseline AI (steps, failures) \n")
+    print("\n             BFS (nodes, steps)  |  A* Simple (nodes, steps)  |  A* Neural Net (nodes, steps)  |  Baseline AI (steps, failures) \n")
     print("----------------------------------------------------------------------------------------------------------------------------------- \n")
 
     # -- Smallest Experiment --

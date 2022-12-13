@@ -42,7 +42,7 @@ def one_hot_encoding(state: tuple):
     # Add claim
     encoded_clause, literals = clause_encoding(claim, literals)
     encoded_state.append(encoded_clause)
-    return tr.tensor(encoded_state) # np.array(encoded_state, dtype=object)
+    return tr.tensor(encoded_state, dtype=tr.float32) # np.array(encoded_state, dtype=object)
     
 
 # A helper method for one_hot_encoding that encodes a single
