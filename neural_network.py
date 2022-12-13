@@ -160,13 +160,13 @@ def train_nn():
 
     # Training Data
     print("\nCreating training data...\n")
-    training_set = generate_data(count=200)
+    training_set = generate_data(count=500)
     states, utilities = training_set
     training_batch = tr.stack(tuple(map(one_hot_encoding, states))), tr.tensor(utilities)
 
     # Testing Data
     print("Creating testing data...\n")
-    testing_set = generate_data(count=50)
+    testing_set = generate_data(count=200)
     states, utilities = testing_set
     testing_batch = tr.stack(tuple(map(one_hot_encoding, states))), tr.tensor(utilities)
 
@@ -174,7 +174,7 @@ def train_nn():
     print("Running gradient descent...\n")
     curves = [], []
     start = time.time()
-    for epoch in range(15):
+    for epoch in range(250):
     
         optimizer.zero_grad()
         e = batch_error(nn, training_batch)
