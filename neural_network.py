@@ -148,10 +148,10 @@ def batch_error(net, batch):
 
 def train_nn():
     nn = tr.nn.Sequential(
-        tr.nn.Linear(8, 64000),
+        tr.nn.Linear(8, 640),
         tr.nn.ReLU(),
         tr.nn.Flatten(),
-        tr.nn.Linear(8192000, 64),
+        tr.nn.Linear(81920, 64),
         tr.nn.MaxPool1d(64),
         tr.nn.ReLU()
     )

@@ -106,11 +106,11 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
 
     print(formatted_title
           + str(avg_node_bfs) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_bfs))+len(str(avg_step_search)))
-          + "                        "
+          + "                     "
           + str(avg_node_astar) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_astar))+len(str(avg_step_search)))
-          + "                      "
+          + "                   "
           + str(avg_node_astar_nn) + ", " + str(avg_step_search) + print_padding(len(str(avg_node_astar_nn))+len(str(avg_step_search)))
-          + "                      "
+          + "                   "
           + str(avg_step_base) + ", " + str(baseline_failures) + " failures" +"\n")
 
     return (node_dist_bfs, node_dist_astar, step_dist_search, step_dist_baseline)
@@ -168,29 +168,29 @@ if __name__ == "__main__":
 
     # -- Smallest Experiment --
     smallest_args = ["p -> q", "q -> r", "p", "q"]
-    str_smallest = "Smallest:               "
+    str_smallest = "Smallest:          "
     smallest_dist = run_batch(smallest_args, str_smallest, 10)
 
     # -- Small Experiment --
     small_args = ["p -> q", "q -> r", "s & ~q", "~r"]
-    str_small = "Small:                  "
+    str_small = "Small:          "
     small_dist = run_batch(smallest_args, str_small, 50)
 
     # -- Medium Experiment --
     medium_args = ["p -> q", "~s & (q -> r)", "p", "t -> s"]
-    str_medium = "Medium:                 "
+    str_medium = "Medium:         "
     if LIMITED_BATCHES: medium_dist = run_batch(medium_args, str_medium, 100, baseline_depth=200, batch_size=50)
     else: medium_dist = run_batch(medium_args, str_medium, 100, baseline_depth=200)
 
     # -- Large Experiment --
     large_args = ["p -> q", "r -> (p & q)", "r | s", "~s"]
-    str_large = "Large:                  "
+    str_large = "Large:          "
     if LIMITED_BATCHES: large_dist = run_batch(large_args, str_large, 100, baseline_depth=200, batch_size=20)
     else: large_dist = run_batch(large_args, str_large, 100, baseline_depth=200)
 
     # -- Largest Experiment --
     largest_args = ["p -> (q -> s)", "s -> ~r", "p & q", "r | s"]
-    str_largest = "Largest:                "
+    str_largest = "Largest:        "
     if LIMITED_BATCHES: largest_dist = run_batch(largest_args, str_largest, 200, baseline_depth=300, batch_size=5)
     else: largest_dist = run_batch(largest_args, str_largest, 200, baseline_depth=300)
 
