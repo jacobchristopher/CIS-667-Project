@@ -19,10 +19,12 @@ def simple_heuristic(state: tuple) -> int:
 
     return steps
 
-# An advnaced heuristic using trained neural network
-def nn_heuristic(state: tuple) -> int:
-    # Load net
-    net = tr.load("saved_net.pt")
-    # Get heuristic value
-    steps = net(tr.stack(tuple(map(nn.one_hot_encoding, [state]))))
-    return steps
+class NeuralNetwork:
+    def __init__(self):
+        self.net = tr.load("saved_net.pt")
+
+    # An advnaced heuristic using trained neural network
+    def nn_heuristic(self, state: tuple) -> int:
+        # Get heuristic value
+        steps = self.net(tr.stack(tuple(map(nn.one_hot_encoding, [state]))))
+        return steps

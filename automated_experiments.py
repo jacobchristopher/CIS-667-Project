@@ -22,11 +22,11 @@ import numpy as np
 # below to True for version that runs in under two minutes. Change the constant
 # below to False for full version (batch sizes of 100).
 
-LIMITED_BATCHES = True
+LIMITED_BATCHES = False
 
 class AutomatedExperiments:
 
-    def run_experiment(args: list, claim_depth: int, baseline_depth: int) -> tuple:
+    def run_experiment(args: list, claim_depth: int, baseline_depth: int, adv_heuristic) -> tuple:
 
         # Generate the claim to prove by a series of random actions applied to args
         generation_state = sh.initial_state(args, "claim")
@@ -38,7 +38,7 @@ class AutomatedExperiments:
         problem = qs.SearchProblem(state, sh.proof_complete)
         plan_bfs, node_count_bfs = qs.breadth_first_search(problem)
         plan_astar, node_count_astar = qs.a_star_search(problem, astar.simple_heuristic)
-        plan_astar_nn, node_count_astar_nn = qs.a_star_search(problem, astar.nn_heuristic)
+        plan_astar_nn, node_count_astar_nn = qs.a_star_search(problem, adv_heuristic)
 
         # -- Run AI --
 
@@ -80,8 +80,10 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
     baseline_failures = 0
     step_dist_baseline = []
 
+    Net = astar.NeuralNetwork()
+    adv = Net.nn_heuristic
     for i in range(batch_size):
-        bfs, a_star, base, a_star_nn = AutomatedExperiments.run_experiment(args, claim_depth, baseline_depth)
+        bfs, a_star, base, a_star_nn = AutomatedExperiments.run_experiment(args, claim_depth, baseline_depth, adv)
         # Node Counts
         node_count_bfs += bfs[1]
         node_count_astar += a_star[1]
@@ -113,7 +115,7 @@ def run_batch(args: list, formatted_title: str, claim_depth: int, baseline_depth
           + "                   "
           + str(avg_step_base) + ", " + str(baseline_failures) + " failures" +"\n")
 
-    return (node_dist_bfs, node_dist_astar, step_dist_search, step_dist_baseline)
+    return (node_dist_bfs, node_dist_astar, step_dist_search, step_dist_baseline, node_dist_astar_nn)
 
 
 def create_experiment_histogram(data: tuple, label: str) -> None:
@@ -127,7 +129,7 @@ def create_experiment_histogram(data: tuple, label: str) -> None:
 
     # A* Nodes
     astar_dist = np.asarray(data[1])
-    astar_label = label + " A* Search Node Distribution"
+    astar_label = label + " A* Simple Node Distribution"
     plt.hist(astar_dist)
     plt.title(astar_label)
     plt.xlabel("Node Count")
@@ -149,6 +151,15 @@ def create_experiment_histogram(data: tuple, label: str) -> None:
     plt.xlabel("Step Count")
     plt.show()
 
+    # A* Nodes
+    astar_dist = np.asarray(data[4])
+    astar_label = label + " A* Neural Net Node Distribution"
+    plt.hist(astar_dist)
+    plt.title(astar_label)
+    plt.xlabel("Node Count")
+    plt.show() 
+
+
 
 def print_padding(size: int) -> str:
     if size >= 10: return ("")
@@ -168,7 +179,7 @@ if __name__ == "__main__":
 
     # -- Smallest Experiment --
     smallest_args = ["p -> q", "q -> r", "p", "q"]
-    str_smallest = "Smallest:          "
+    str_smallest = "Smallest:       "           
     smallest_dist = run_batch(smallest_args, str_smallest, 10)
 
     # -- Small Experiment --
