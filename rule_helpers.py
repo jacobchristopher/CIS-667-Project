@@ -87,12 +87,7 @@ rule_dict = [("Modus Ponens", ["a", "a -> b"], "b"),
              ("Conjunction", ["a", "b"], "a & b"),
              ("Disjunctive Syllogism", ["a | b", "~a"], "b"),
              ("Disjunctive Syllogism", ["a | b", "~b"], "a"),
-             ("Hypothetical Syllogism", ["a -> b"], "a -> b"),  # a -> b, b -> c = a -> c
-                                                                # Handled in parser
-             #("Addition", ["a"], "a | b"),
-             #("Resolution", ["a | b", "~a | c"], "a | c"),
-             #("Double Negation", ["~~a"], "a"),
-            ]
+             ("Hypothetical Syllogism", ["a -> b"], "a -> b")]
 
 # Find applicable rules from the rule dictionary
 def applicable_rules(state: tuple) -> list:

@@ -5,15 +5,21 @@ import a_star_heuristic as astar
 import baseline_ai as baseline
 import sys
 
+# Helper method to read input from user to set intital state
 def read_arg_input() -> tuple:
     print("\n------ Welcome to Logical Inference Solver ------\n")
     print("Follow the prompts to begin.\n")
     
     print("Enter the number corresponding to the AI you would like to use: \n")
-    print("      1. Human (You select actions)   2. Baseline AI (Random) \n" +
-          "      3. Breadth First Search         4. A* Search            \n ")
+    print("      1. Human (You select actions)     2. Baseline AI (Random) \n" +
+          "      3. Breadth First Search           4. A* Search            \n" +
+          "      5. A* Search + Neural Network                             \n")
     method = input()
     print("\n")
+    
+    # Net must be trained to use option 5
+    if method == '5': print("Note: Neural network must already be trained to use this method.\n")
+
     next_arg = ""
     arg_list = []
     while not next_arg == "DONE":
@@ -25,7 +31,7 @@ def read_arg_input() -> tuple:
     print("\n-----------------------------------------------\n")
     return(arg_list, claim, method)
 
-
+# Helper method to format proof output correctly
 def print_padding(size: int) -> str:
     if size >= 14: (" ")
     elif size == 13: return ("  ")
@@ -42,7 +48,7 @@ def print_padding(size: int) -> str:
     elif size == 2: return ("             ")
     else: return ("              ")
 
-
+# Main method when script is executed
 if __name__ == "__main__":
     (args, claim, method) = read_arg_input()
     state = sh.initial_state(args, claim)
@@ -90,13 +96,19 @@ if __name__ == "__main__":
                 rule += " "
                 rule += str(tuple(map(lambda i: i + 1, hist[hist_index][1])))
                 hist_index += 1
-            #else: print("\n")
             print(str(i+1) + ". " + args[i] + print_padding(len(args[i]) + len(str(i+1))) + rule +"\n")
 
     else:
     
         if method == '3': plan, node_count = breadth_first_search(problem)
-        else: plan, node_count = a_star_search(problem, astar.simple_heuristic)
+        elif method == '4': plan, node_count = a_star_search(problem, astar.simple_heuristic)
+        elif method == '5':
+            Net = astar.NeuralNetwork()
+            adv = Net.nn_heuristic
+            plan, node_count = a_star_search(problem, adv)
+        else:
+            print("Invalid solving method!\n")
+            sys.exit()
 
         states = [problem.initial_state]
         for a in range(len(plan)):

@@ -17,7 +17,7 @@ In order to run the Neural Networks leveraged by the advanced AI, download and i
 
 In a python enviornement, start run_solver.py.
 
-First, select the methodology to use: 1. Human (choose which rules to apply), 2. Baseline AI (random selection), 3. Breadth First Search, 4. A* Search. (Enter the number corredsponding to the methodology as input.)
+First, select the methodology to use: 1. Human (choose which rules to apply), 2. Baseline AI (random selection), 3. Breadth First Search, 4. A* Search (simple heuristic) 5. A* Search (advanced heuristic using neural network). (Enter the number corredsponding to the methodology as input.)
 
 The program will prompt for a series of assumptions. When all have been entered, type 'DONE'. Any single character can act as a literal and the operators correspond to the following symbols:
 
@@ -33,9 +33,14 @@ The AI will then compute which inference rules need to be applied to the assumpt
 The output will be a formatted proof indicating which rules were applied to reach the final state.
 
 
+# Using the Advanced Heuristic
+
+In order to use the advanced heuristic in the interactive run (and later in the computer experiments), it is necessary to train the neural network used by this heuristic. Running the neural_network.py script trains a neural network using randomized data and generates a the file 'saved_net.pt' which is a saved copy of the trained network. Once this file has been generated, the advanced heuristic can be used.
+
+
 # Computer Experiements
 
-Automated computer experiments can be run using automated_experiments.py. These experiments compare the efficiency of three AI implementations: baseline (random selection), Breadth First Search, and A* Search. There are two options when running these experiments:
+Automated computer experiments can be run using automated_experiments.py. These experiments compare the efficiency of three AI implementations: baseline (random selection), Breadth First Search, and A* Search using simple and advanced (neural-network-driven) heuristics. There are two options when running these experiments:
 
 - To run full set of tests (5 batches of 100, increasing in complexity), set constant LIMITED_BATCHES to False. This version takes roughly ten minutes to run.
 - To run set of tests with reduced batch sizes (specifically for the more complex problems), set constant LIMITED_BATCHES to true. This version runs in about two minutes.
@@ -54,6 +59,11 @@ The files queue_search.py and sections of test_solver.py levarage implementation
 Katz, Garrett. "queue_search_code.py." Homework 01. CIS 667, Fall 2022.
 
 Katz, Garrett. "roomba_heuristic_test.py." Homework 01. CIS 667, Fall 2022.
+
+
+The file neural_network.py leverages implementation from the following source:
+
+Katz, Garrett. " ProjectExample.ipynb." Lecture 31, CIS 667, December 5, 2022.
 
 ---------------------------------------------------------------------------------------------------------------
 

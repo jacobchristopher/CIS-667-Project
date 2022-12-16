@@ -3,6 +3,17 @@ import solver_helpers as sh
 import rule_helpers as rh
 import queue_search as qs
 import a_star_heuristic as astar
+import neural_network as nn
+import numpy as np
+import numpy.testing as npt
+
+# Notes about test file:
+#
+#   Tests are specifically designed to confirm that the domain works
+#   as expected. These are not a metric of the AI's performance (as 
+#   automated_experiments.py is), but rather a way to validate that
+#   helper functions/objects behave as anticipated.
+#
 
 class HelperTestCase(ut.TestCase):
 
