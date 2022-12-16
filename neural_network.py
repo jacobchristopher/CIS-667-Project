@@ -130,6 +130,7 @@ def generate_data(count=500) -> list:
     return state_list, result_list
 
 
+# Calculate error in the batch
 def batch_error(net, batch):
     states, utilities = batch
     u = utilities.reshape(-1,1).float()
@@ -209,5 +210,6 @@ def train_nn():
     # Save torch model
     tr.save(nn, "saved_net.pt")
 
+# Run file (main) to train the neural network
 if __name__ == "__main__":
     train_nn()

@@ -24,7 +24,6 @@ class SearchNode(object):
         return self.problem.is_goal(self.state)
     def children(self):
         if len(self.child_list) > 0: return self.child_list
-        # for action, step_cost in sh.valid_actions(self.state):
         for action in sh.valid_actions(self.state):
             new_state = sh.apply_rule(action, self.state)
             self.child_list.append(
@@ -61,10 +60,6 @@ class FIFOFrontier:
         return len(self.queue_nodes) > 0
 
 class PriorityHeapFIFOFrontier(object):
-    """
-    Implementation using heapq 
-    https://docs.python.org/3/library/heapq.html
-    """
     def __init__(self):
         self.heap = []
         self.state_lookup = {}
@@ -72,9 +67,9 @@ class PriorityHeapFIFOFrontier(object):
 
     def push(self, node):
         if node.state in self.state_lookup:
-            entry = self.state_lookup[node.state] # = [risk, count, node, removed]
+            entry = self.state_lookup[node.state]
             if entry[0] <= node.path_risk: return
-            entry[-1] = True # mark removed
+            entry[-1] = True
         new_entry = [node.path_risk, self.count, node, False]
         hq.heappush(self.heap, new_entry)
         self.state_lookup[node.state] = new_entry
@@ -99,7 +94,7 @@ def queue_search(frontier, problem):
     root = problem.root_node()
     frontier.push(root)
     while frontier.is_not_empty():
-        node = frontier.pop() # need to count how many times this happens
+        node = frontier.pop()
         node_count += 1
         if node.is_goal(): break
         explored.add(node.state)
@@ -108,7 +103,6 @@ def queue_search(frontier, problem):
             frontier.push(child)
     plan = node.path() if node.is_goal() else []
 
-    # Second return value should be node count, not 0
     return plan, node_count
 
 def breadth_first_search(problem):

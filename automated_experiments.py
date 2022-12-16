@@ -19,7 +19,7 @@ import numpy as np
 # will reduce the runtime (as this limits the number of actions the AI takes).
 
 # Finally, runtime can be imrpoved by limiting batch sizes. Change the constant
-# below to True for version that runs in under two minutes. Change the constant
+# below to True for version that runs in about ten minutes. Change the constant
 # below to False for full version (batch sizes of 100).
 
 LIMITED_BATCHES = False

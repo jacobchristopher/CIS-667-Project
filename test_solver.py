@@ -7,6 +7,14 @@ import neural_network as nn
 import numpy as np
 import numpy.testing as npt
 
+# Notes about test file:
+#
+#   Tests are specifically designed to confirm that the domain works
+#   as expected. These are not a metric of the AI's performance (as 
+#   automated_experiments.py is), but rather a way to validate that
+#   helper functions/objects behave as anticipated.
+#
+
 class HelperTestCase(ut.TestCase):
 
     def test_initial_state(self):
@@ -305,29 +313,6 @@ class QueueSearchTestCase(ut.TestCase):
         self.assertEqual(hist, final_hist)
 
 
-class NeuralNetworkTestCase(ut.TestCase):
-
-    # def test_one_hot_simple(self):
-    #     args = ["p -> (q -> r)", "p", "q"]
-    #     claim = "r"
-    #     state = sh.initial_state(args, claim)       
-    #     encoded = nn.one_hot_encoding(state)
-    #     exp_encoding = np.array(
-    #         [['01000000', '10000010', '11000000', '00100000', '10000010', '00010000', '10100000', '00000000'],
-    #          ['01000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
-    #          ['00100000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
-    #          ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
-    #          ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
-    #          ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'],
-    #          ['00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000'], 
-    #          ['00010000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000', '00000000']],
-    #          dtype=object)
-    #     npt.assert_array_equal(encoded, exp_encoding)
-
-    def test_nn_training(self):
-        nn.train_nn()
-
-
 # Note that __main__ is written based on test function implementation
 # from the following source.
 #   Title:          roomba_heuristic_test.py
@@ -336,7 +321,7 @@ class NeuralNetworkTestCase(ut.TestCase):
 if __name__ == "__main__":
 
     num, errs, fails = 0, 0, 0
-    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase, QueueSearchTestCase, NeuralNetworkTestCase]
+    test_cases = [HelperTestCase, RuleTestCase, RuleDictTestCase, QueueSearchTestCase]
     
     for test_case in test_cases:
         test_suite = ut.TestLoader().loadTestsFromTestCase(test_case)

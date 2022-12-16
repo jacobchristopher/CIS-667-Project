@@ -19,6 +19,8 @@ def simple_heuristic(state: tuple) -> int:
 
     return steps
 
+# Encapsulate this in a class so that net is only
+# loaded once
 class NeuralNetwork:
     def __init__(self):
         self.net = tr.load("saved_net.pt")
