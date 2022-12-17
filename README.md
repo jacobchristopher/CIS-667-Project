@@ -63,7 +63,7 @@ Katz, Garrett. "roomba_heuristic_test.py." Homework 01. CIS 667, Fall 2022.
 
 The file neural_network.py leverages implementation from the following source:
 
-Katz, Garrett. " ProjectExample.ipynb." Lecture 31, CIS 667, December 5, 2022.
+Katz, Garrett. "ProjectExample.ipynb." Lecture 31, CIS 667, December 5, 2022.
 
 ---------------------------------------------------------------------------------------------------------------
 
